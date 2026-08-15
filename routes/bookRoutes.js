@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const db = require('../database');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
@@ -39,6 +40,9 @@ router.post('/', authenticateToken, (req, res) => {
 });
 
 // Admin Only: Get all registered users
+ // Make sure bcrypt is required at the top if not already
+
+// Admin Only: Get all registered users
 router.get('/users', authenticateToken, (req, res) => {
     if (!req.user.isAdmin) return res.status(403).json({ error: 'Admins only' });
 
@@ -46,6 +50,34 @@ router.get('/users', authenticateToken, (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
+});
+
+// Admin Only: Manually update/reset a user's password
+router.put('/users/:id/password', authenticateToken, async (req, res) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).json({ error: 'Access denied. Admins only.' });
+    }
+
+    const userId = req.params.id;
+    const { newPassword } = req.body;
+
+    if (!newPassword || newPassword.trim() === '') {
+        return res.status(400).json({ error: 'New password cannot be empty' });
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId], function(err) {
+            if (err) return res.status(500).json({ error: err.message });
+            if (this.changes === 0) return res.status(404).json({ error: 'User not found' });
+
+            res.json({ success: 'User password updated successfully by admin' });
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error while hashing password' });
+    }
 });
 
 module.exports = router;

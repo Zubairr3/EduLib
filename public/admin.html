@@ -64,7 +64,7 @@
         <!-- Right Column: Registered Users List -->
         <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-xl font-bold text-slate-800 mb-2">Registered Platform Users</h2>
-            <p class="text-slate-500 text-xs mb-5">Audit platform membership and view registered accounts.</p>
+            <p class="text-slate-500 text-xs mb-5">Audit platform membership, view registered accounts, and manage passwords.</p>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -73,6 +73,7 @@
                             <th class="py-3 px-4">ID</th>
                             <th class="py-3 px-4">Username</th>
                             <th class="py-3 px-4">Role</th>
+                            <th class="py-3 px-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="userTableBody" class="text-sm divide-y divide-slate-100">
@@ -85,8 +86,32 @@
     </main>
 
     <script>
+        // Global function for resetting user passwords from the UI table
+        let token = '';
+
+        async function resetUserPassword(userId, username) {
+            const newPassword = prompt(`Enter a new temporary password for user "${username}":`);
+            if (!newPassword || newPassword.trim() === '') return;
+
+            try {
+                const res = await fetch(`/api/books/users/${userId}/password`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify({ newPassword: newPassword.trim() })
+                });
+                const data = await res.json();
+                if (data.error) showToast(data.error, 'error');
+                else showToast(`Password successfully updated for ${username}!`, 'success');
+            } catch (err) {
+                showToast('Failed to reset password.', 'error');
+            }
+        }
+
         $(document).ready(function() {
-            const token = localStorage.getItem('token');
+            token = localStorage.getItem('token');
             if (!token) { window.location.href = '/'; return; }
 
             function showToast(message, type) {
@@ -95,6 +120,8 @@
                 else $toast.addClass('bg-red-500').text('⚠ ' + message);
                 $toast.fadeIn(300).delay(3000).fadeOut(300);
             }
+            // Make showToast accessible globally if needed
+            window.showToast = showToast;
 
             // Fetch Registered Users
             async function fetchUsers() {
@@ -116,6 +143,12 @@
                                 <span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.is_admin ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">
                                     ${u.is_admin ? 'Admin' : 'Member'}
                                 </span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <button onclick="resetUserPassword(${u.id}, '${u.username}')" 
+                                    class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition">
+                                    Reset Password
+                                </button>
                             </td>
                         </tr>`).join('');
                     $('#userTableBody').html(rows);
