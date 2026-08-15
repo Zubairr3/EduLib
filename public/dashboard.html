@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library | Community Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        .book-card { transition: all 0.3s ease; }
+        .book-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        #toast, #postModal { display: none; }
+    </style>
+</head>
+<body class="pb-20 text-slate-800">
+
+    <div id="toast" class="fixed top-6 right-6 px-6 py-3 rounded-lg shadow-xl text-white font-semibold z-50 tracking-wide"></div>
+
+    <nav class="glass-nav fixed top-0 w-full z-40 px-6 py-4 flex justify-between items-center shadow-sm">
+        <h1 class="text-xl font-extrabold text-indigo-600">📚 Community E-Library</h1>
+        <div class="flex items-center space-x-4">
+            <button id="openModalBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-md transition-all">+ Share Resource</button>
+            <button id="logoutBtn" class="text-sm font-semibold text-slate-500 hover:text-red-600">Log Out</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto mt-28 px-4">
+        <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h2 class="text-3xl font-bold text-slate-800">Library Feed</h2>
+                <p class="text-slate-500 text-sm mt-1">Explore books, videos, articles, images, and notes shared by members.</p>
+            </div>
+            <form id="searchForm" class="w-full md:w-96 relative">
+                <input type="text" id="searchInput" placeholder="Search by title, author, or poster..." title="Search library" class="w-full px-4 py-3 rounded-xl border focus:border-indigo-500 outline-none bg-white shadow-sm">
+            </form>
+        </div>
+
+        <div id="loader" class="text-center py-20">Loading resources...</div>
+        <div id="bookGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="emptyState" class="hidden text-center py-20 text-slate-500 font-bold">No resources found. Be the first to share one!</div>
+    </main>
+
+    <!-- Share Resource Modal -->
+    <div id="postModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl relative border border-slate-100">
+            <button id="closeModalBtn" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+            <h3 class="text-2xl font-bold text-slate-800 mb-2">Publish New Content</h3>
+            <p class="text-slate-500 text-xs mb-6">Share books, videos, articles, images, PDFs, text files, or write notes.</p>
+            
+            <form id="shareForm" class="space-y-4">
+                <div>
+                    <label for="postTitle" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Title</label>
+                    <input type="text" id="postTitle" placeholder="Resource title or note heading" title="Title" class="w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="postAuthor" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Author / Creator</label>
+                        <input type="text" id="postAuthor" placeholder="e.g., John Doe" title="Author" class="w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm" required>
+                    </div>
+                    <div>
+                        <label for="postType" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Type</label>
+                        <select id="postType" title="Type" class="w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                            <option value="Book">Book</option>
+                            <option value="Video">Video</option>
+                            <option value="Article">Article</option>
+                            <option value="Image">Image</option>
+                            <option value="PDF">PDF</option>
+                            <option value="Text Note">Text Note</option>
+                            <option value="Link">Link</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="postUrl" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Media / File / Link URL</label>
+                    <input type="url" id="postUrl" placeholder="https://link-to-file.com/resource" title="URL" class="w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                </div>
+                <div>
+                    <label for="postContent" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Written Content / Notes / Summary</label>
+                    <textarea id="postContent" rows="3" placeholder="Write anything here for others to read..." title="Content" class="w-full px-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"></textarea>
+                </div>
+                <button type="submit" id="publishBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl shadow-md transition-all">Publish to Community</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const token = localStorage.getItem('token');
+            if (!token) window.location.href = '/';
+
+            function showToast(message, type) {
+                const $toast = $('#toast').removeClass('bg-green-500 bg-red-500');
+                if (type === 'success') $toast.addClass('bg-green-500').text('✓ ' + message);
+                else $toast.addClass('bg-red-500').text('⚠ ' + message);
+                $toast.fadeIn(300).delay(3000).fadeOut(300);
+            }
+
+            // Modal Toggles
+            $('#openModalBtn').click(() => $('#postModal').fadeIn(200));
+            $('#closeModalBtn').click(() => $('#postModal').fadeOut(200));
+
+            // Fetch All Posts
+            async function fetchPosts(query = '') {
+                $('#loader').show();
+                $('#emptyState').hide();
+                $('#bookGrid').empty();
+
+                try {
+                    const res = await fetch(`/api/books?query=${encodeURIComponent(query)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.status === 401) { localStorage.clear(); window.location.href = '/'; return; }
+                    
+                    const posts = await res.json();
+                    $('#loader').hide();
+
+                    if (posts.length === 0) return $('#emptyState').show();
+
+                    const html = posts.map(p => `
+                        <div class="book-card bg-white rounded-2xl overflow-hidden border border-slate-200 flex flex-col h-full shadow-sm">
+                            <div class="p-6 flex-1 flex flex-col">
+                                <div class="flex justify-between items-start mb-3">
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-600 font-bold text-xs uppercase tracking-wider rounded-full">${p.type}</span>
+                                    <span class="text-xs text-slate-400 font-medium">Posted by: <strong class="text-slate-700">${p.posted_by}</strong></span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-800">${p.title}</h3>
+                                <p class="text-slate-500 text-sm font-medium mb-3">By ${p.author}</p>
+                                ${p.content ? `<p class="text-slate-600 text-sm bg-slate-50 p-3 rounded-xl mb-4 flex-1 italic">"${p.content}"</p>` : '<div class="flex-1"></div>'}
+                                
+                                ${p.url ? `<a href="${p.url}" target="_blank" class="inline-flex items-center text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Access Resource →</a>` : ''}
+                            </div>
+                        </div>`).join('');
+                    $('#bookGrid').html(html);
+                } catch (err) {
+                    $('#loader').hide();
+                    showToast('Failed to load community feed.', 'error');
+                }
+            }
+
+            // Share Form Submit Handler
+            $('#shareForm').submit(async function(e) {
+                e.preventDefault();
+                const $btn = $('#publishBtn');
+                $btn.text('Publishing...').prop('disabled', true);
+
+                const payload = {
+                    title: $('#postTitle').val(),
+                    author: $('#postAuthor').val(),
+                    url: $('#postUrl').val(),
+                    type: $('#postType').val(),
+                    content: $('#postContent').val()
+                };
+
+                try {
+                    const res = await fetch('/api/books', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data.error) showToast(data.error, 'error');
+                    else {
+                        showToast('Successfully published!', 'success');
+                        $('#shareForm')[0].reset();
+                        $('#postModal').fadeOut(200);
+                        fetchPosts();
+                    }
+                } catch (err) { showToast('Posting failed.', 'error'); }
+                finally { $btn.text('Publish to Community').prop('disabled', false); }
+            });
+
+            let searchTimeout;
+            $('#searchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => fetchPosts($(this).val()), 400);
+            });
+
+            $('#logoutBtn').click(() => { localStorage.clear(); window.location.href = '/'; });
+            fetchPosts();
+        });
+    </script>
+</body>
+</html>

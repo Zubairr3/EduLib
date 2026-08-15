@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library | Welcome</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            /* Arctic Frost Light Background Gradient */
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+        }
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.9); 
+            -webkit-backdrop-filter: blur(16px); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
+            box-shadow: 0 20px 40px rgba(14, 116, 144, 0.1); 
+        }
+        #toast { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Toast Notification Banner -->
+    <div id="toast" class="fixed top-6 right-6 px-6 py-3 rounded-lg shadow-xl text-white font-semibold z-50 tracking-wide"></div>
+
+    <div class="glass-panel p-8 sm:p-10 rounded-2xl w-full max-w-md transition-all duration-300">
+        
+        <!-- Header / Branding -->
+        <div class="text-center mb-6">
+            <span class="text-3xl mb-2 inline-block">📚</span>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">E-Library Portal</h1>
+            <p id="formSubtitle" class="text-slate-600 text-sm mt-1 font-medium">Sign in to your account to continue</p>
+        </div>
+
+        <!-- Flow Tabs (Sign In / Register) -->
+        <div class="flex rounded-xl bg-slate-200/60 p-1 mb-6 border border-slate-300/50">
+            <button type="button" id="tabLogin" class="flex-1 py-2 text-sm font-bold rounded-lg bg-white text-sky-700 shadow-sm transition-all">Sign In</button>
+            <button type="button" id="tabRegister" class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Create Account</button>
+        </div>
+        
+        <form id="authForm" class="space-y-4">
+            <div>
+                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" title="Username" class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-slate-800 text-sm shadow-sm" required>
+            </div>
+            
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Password</label>
+                    <a href="#" id="forgotPasswordLink" class="text-xs font-semibold text-sky-700 hover:text-sky-900 transition-colors">Forgot password?</a>
+                </div>
+                
+                <!-- Password Field with Visibility Toggle Button -->
+                <div class="relative">
+                    <input type="password" id="password" placeholder="••••••••" title="Password" class="w-full pl-4 pr-12 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-slate-800 text-sm shadow-sm" required>
+                    <button type="button" id="togglePassword" title="Toggle password visibility" class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+                        <!-- Eye SVG Icon -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Primary Action Button -->
+            <button type="submit" id="submitBtn" class="w-full mt-2 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-sky-200 transition-all transform hover:-translate-y-0.5">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Secondary Navigation Link Switcher -->
+        <div class="mt-6 text-center text-sm text-slate-600">
+            <span id="switchText">Don't have an account?</span>
+            <button type="button" id="switchModeBtn" class="font-bold text-sky-700 hover:text-sky-900 ml-1 focus:outline-none">Register</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let isLoginMode = true;
+
+            function showToast(message, type) {
+                const $toast = $('#toast').removeClass('bg-green-500 bg-red-500 bg-sky-600');
+                if (type === 'success') $toast.addClass('bg-green-500').text('✓ ' + message);
+                else if (type === 'info') $toast.addClass('bg-sky-600').text('ℹ ' + message);
+                else $toast.addClass('bg-red-500').text('⚠ ' + message);
+                $toast.fadeIn(300).delay(3500).fadeOut(300);
+            }
+
+            // UI Mode Switcher (Sign In vs Register Tabs)
+            function setMode(loginMode) {
+                isLoginMode = loginMode;
+                if (isLoginMode) {
+                    $('#tabLogin').addClass('bg-white text-sky-700 shadow-sm font-bold').removeClass('text-slate-600 font-semibold');
+                    $('#tabRegister').removeClass('bg-white text-sky-700 shadow-sm font-bold').addClass('text-slate-600 font-semibold');
+                    $('#formSubtitle').text('Sign in to your account to continue');
+                    $('#submitBtn').text('Sign In');
+                    $('#switchText').text("Don't have an account?");
+                    $('#switchModeBtn').text('Register');
+                    $('#forgotPasswordLink').show();
+                } else {
+                    $('#tabRegister').addClass('bg-white text-sky-700 shadow-sm font-bold').removeClass('text-slate-600 font-semibold');
+                    $('#tabLogin').removeClass('bg-white text-sky-700 shadow-sm font-bold').addClass('text-slate-600 font-semibold');
+                    $('#formSubtitle').text('Create a new account in seconds');
+                    $('#submitBtn').text('Create Account');
+                    $('#switchText').text('Already have an account?');
+                    $('#switchModeBtn').text('Sign In');
+                    $('#forgotPasswordLink').hide();
+                }
+            }
+
+            $('#tabLogin').click(() => setMode(true));
+            $('#tabRegister').click(() => setMode(false));
+            $('#switchModeBtn').click(() => setMode(!isLoginMode));
+
+            // Password Visibility Toggle Handler
+            $('#togglePassword').click(function() {
+                const $passwordInput = $('#password');
+                const type = $passwordInput.attr('type') === 'password' ? 'text' : 'password';
+                $passwordInput.attr('type', type);
+                $(this).toggleClass('text-sky-600');
+            });
+
+            // Forgot Password Mock Action
+            $('#forgotPasswordLink').click(function(e) {
+                e.preventDefault();
+                showToast('Password recovery: Please reach out to your system admin.', 'info');
+            });
+
+            // Form Submit / Authentication Processing
+            $('#authForm').on('submit', async function(e) {
+                e.preventDefault();
+                const username = $('#username').val().trim();
+                const password = $('#password').val().trim();
+                
+                if (!username || !password) return showToast('Please fill out all fields.', 'error');
+
+                const endpoint = isLoginMode ? 'login' : 'register';
+                const $btn = $('#submitBtn');
+                const originalText = $btn.text();
+                $btn.text('Processing...').prop('disabled', true);
+
+                try {
+                    const res = await fetch(`/api/auth/${endpoint}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await res.json();
+                    
+                    if (data.error) {
+                        showToast(data.error, 'error');
+                    } else {
+                        if (isLoginMode) {
+                            showToast('Login successful! Redirecting...', 'success');
+                            localStorage.setItem('token', data.token);
+                            setTimeout(() => { window.location.href = data.isAdmin ? '/admin.html' : '/dashboard.html'; }, 1000);
+                        } else {
+                            showToast('Account created successfully! Please sign in.', 'success');
+                            setMode(3); // Sign in mode
+                            $('#password').val('');
+                        }
+                    }
+                } catch (err) {
+                    showToast('Server connection failure.', 'error');
+                } finally {
+                    $btn.text(originalText).prop('disabled', false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

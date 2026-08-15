@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Library | Admin Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+        #toast { display: none; }
+    </style>
+</head>
+<body class="pb-20 text-slate-800">
+
+    <div id="toast" class="fixed top-6 right-6 px-6 py-3 rounded-lg shadow-xl text-white font-semibold z-50 tracking-wide"></div>
+
+    <nav class="glass-nav fixed top-0 w-full z-40 px-6 py-4 flex justify-between items-center shadow-sm">
+        <h1 class="text-xl font-extrabold text-slate-900">🛡️ Admin Command Center</h1>
+        <div class="flex items-center space-x-4">
+            <a href="/dashboard.html" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">Community Feed</a>
+            <button id="logoutBtn" class="text-sm font-semibold text-slate-500 hover:text-red-600">Log Out</button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto mt-28 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Publish Official Content -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Publish Official Resource</h2>
+            <p class="text-slate-500 text-xs mb-5">Add books, videos, PDFs, or articles.</p>
+            
+            <form id="adminPostForm" class="space-y-4">
+                <div>
+                    <label for="title" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Title</label>
+                    <input type="text" id="title" placeholder="Resource title" title="Title" class="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm" required>
+                </div>
+                <div>
+                    <label for="author" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Author</label>
+                    <input type="text" id="author" placeholder="Author name" title="Author" class="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm" required>
+                </div>
+                <div>
+                    <label for="url" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">URL / Link / File</label>
+                    <input type="url" id="url" placeholder="https://..." title="URL" class="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm" required>
+                </div>
+                <div>
+                    <label for="type" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Type</label>
+                    <select id="type" title="Type" class="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                        <option value="Book">Book</option>
+                        <option value="Video">Video</option>
+                        <option value="Article">Article</option>
+                        <option value="Image">Image</option>
+                        <option value="PDF">PDF</option>
+                        <option value="Text Note">Text Note</option>
+                        <option value="Link">Link</option>
+                    </select>
+                </div>
+                <button type="submit" id="submitBtn" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow-md transition-all text-sm">Publish Resource</button>
+            </form>
+        </div>
+
+        <!-- Right Column: Registered Users List -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Registered Platform Users</h2>
+            <p class="text-slate-500 text-xs mb-5">Audit platform membership and view registered accounts.</p>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-100 text-xs uppercase tracking-wider text-slate-400 font-bold">
+                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-4">Username</th>
+                            <th class="py-3 px-4">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody" class="text-sm divide-y divide-slate-100">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        $(document).ready(function() {
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = '/'; return; }
+
+            function showToast(message, type) {
+                const $toast = $('#toast').removeClass('bg-green-500 bg-red-500');
+                if (type === 'success') $toast.addClass('bg-green-500').text('✓ ' + message);
+                else $toast.addClass('bg-red-500').text('⚠ ' + message);
+                $toast.fadeIn(300).delay(3000).fadeOut(300);
+            }
+
+            // Fetch Registered Users
+            async function fetchUsers() {
+                try {
+                    const res = await fetch('/api/books/users', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (res.status === 403) {
+                        alert('Admin access required.');
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                    const users = await res.json();
+                    const rows = users.map(u => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="py-3 px-4 font-mono text-slate-400">#${u.id}</td>
+                            <td class="py-3 px-4 font-bold text-slate-700">${u.username}</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${u.is_admin ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}">
+                                    ${u.is_admin ? 'Admin' : 'Member'}
+                                </span>
+                            </td>
+                        </tr>`).join('');
+                    $('#userTableBody').html(rows);
+                } catch (err) { console.error(err); }
+            }
+
+            // Publish Form Handler
+            $('#adminPostForm').submit(async function(e) {
+                e.preventDefault();
+                const $btn = $('#submitBtn');
+                $btn.text('Publishing...').prop('disabled', true);
+
+                const payload = {
+                    title: $('#title').val().trim(),
+                    author: $('#author').val().trim(),
+                    url: $('#url').val().trim(),
+                    type: $('#type').val()
+                };
+
+                try {
+                    const res = await fetch('/api/books', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data.error) showToast(data.error, 'error');
+                    else {
+                        showToast('Official resource published!', 'success');
+                        $('#adminPostForm')[0].reset();
+                    }
+                } catch (err) { showToast('Publishing failed.', 'error'); }
+                finally { $btn.text('Publish Resource').prop('disabled', false); }
+            });
+
+            $('#logoutBtn').click(() => { localStorage.clear(); window.location.href = '/'; });
+            fetchUsers();
+        });
+    </script>
+</body>
+</html>
