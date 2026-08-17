@@ -15,14 +15,25 @@
 
 ---
 
+## 🚀 Access the Live Application
+
+Experience the live production deployment and test the platform instantly:  
+👉 **[View EduLib Knowledge Hub Live Demo](https://edulib-7ane.onrender.com/)**
+
+### 🔑 Demo Credentials for Testing
+You can use the following account to log in and explore all features immediately:
+* **Username:** `user1`
+* **Password:** `User123`
+
+---
+
 ## ✨ Key Features
 
 * **🌐 Single-Screen SaaS Landing Experience:** Clean, side-by-side authentication screen featuring an overview of the platform's core advantages.
 * **📂 Unified Library & Feeds:** Dynamic filtering between community-wide knowledge repositories and personal user contributions.
 * **☁️ Multi-Format Cloud Storage:** Secure asset integration via Cloudinary with automatic raw-file streaming to support PDFs, Word documents, videos, and images without browser crash errors.
 * **🔒 Robust Authentication & RBAC:** Stateless session handling using JSON Web Tokens (JWT) and secure password encryption via `bcrypt`.
-* **⚙️ Interactive IT Admin Control Panel:** 
-  * Global resource broadcasting with **Quill.js** rich-text formatting.
+* **⚙️ Interactive IT Admin Control Panel:** * Global resource broadcasting with **Quill.js** rich-text formatting.
   * Uniform administrative card controls (Edit & Delete actions across all feed items).
   * Collapsible **IT Helpdesk** widget with clear input labels for force-resetting employee credentials.
 * **🎨 Modern Enterprise UI:** Scannable card layouts, SVG icon sets, title-case standardization, and automated text truncation with expandable *Read More* views.
@@ -35,13 +46,6 @@
 * **Backend:** Node.js, Express.js, Multer, JWT, bcryptjs
 * **Database:** MongoDB Atlas (Mongoose ODM)
 * **Storage & Hosting:** Cloudinary CDN, Render Cloud Platform
-
----
-
-## 🚀 Access the Live Application
-
-Experience the live production deployment here:  
-👉 **[View EduLib Knowledge Hub Live Demo](https://edulib-7ane.onrender.com/)**
 
 ---
 
