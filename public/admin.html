@@ -68,7 +68,28 @@
                 <div class="input-group"><label>Resource Title</label><input type="text" id="postTitle" required></div>
                 <div class="input-group">
                     <label>Content Category</label>
-                    <select id="postType"><option value="Official Notice">Official Notice</option><option value="Documentation">Technical Documentation</option></select>
+                    
+                    <select id="postType">
+                        <option value="" disabled selected>Select resource type...</option>
+    
+    <!-- Official & Technical Options -->
+    <option value="Official Notice">Official Notice</option>
+    <option value="Documentation">Technical Documentation</option>
+    
+    <!-- Document & Text Options -->
+    <option value="PDF">PDF Document</option>
+    <option value="Word">Word Document (.docx)</option>
+    
+    <!-- Media Options -->
+    <option value="Video">Video Presentation</option>
+    <option value="Image">Image / Graphic</option>
+    
+    <!-- Link Option -->
+    <option value="Link">External Link (URL)</option>
+                    
+                    
+                    
+                    </select>
                 </div>
                 <div class="input-group"><label>Attach Official File</label><input type="file" id="mediaFile"></div>
                 <div class="input-group"><label>Detailed Notes</label><div id="editor-container" style="height: 180px; background: white;"></div></div>
@@ -88,7 +109,23 @@
                 <div class="input-group"><label>Resource Title</label><input type="text" id="editPostTitle" required></div>
                 <div class="input-group">
                     <label>Content Category</label>
-                    <select id="editPostType"><option value="Official Notice">Official Notice</option><option value="Documentation">Technical Documentation</option><option value="Research Paper">Research Paper</option></select>
+                    <select id="editPostType"><option value="Research Paper">Research Paper</option>
+                    <option value="" disabled selected>Select resource type...</option>
+    
+    <!-- Official & Technical Options -->
+    <option value="Official Notice">Official Notice</option>
+    <option value="Documentation">Technical Documentation</option>
+    
+    <!-- Document & Text Options -->
+    <option value="PDF">PDF Document</option>
+    <option value="Word">Word Document (.docx)</option>
+    
+    <!-- Media Options -->
+    <option value="Video">Video Presentation</option>
+    <option value="Image">Image / Graphic</option>
+    
+    <!-- Link Option -->
+    <option value="Link">External Link (URL)</option></select>
                 </div>
                 <div class="input-group"><label>Detailed Notes</label><div id="edit-editor-container" style="height: 150px; background: white;"></div></div>
                 <button type="submit" class="btn" style="margin-top: 15px; background: #0f172a;">Save Changes</button>
