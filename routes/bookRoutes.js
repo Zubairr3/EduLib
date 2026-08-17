@@ -1,82 +1,87 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
-const db = require('../database');
-const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
+const Post = require('../models/Post');
+const jwt = require('jsonwebtoken');
+const upload = require('../middleware/upload');
 
-// Get all posts (Searchable)
-router.get('/', authenticateToken, (req, res) => {
-    const { query } = req.query;
-    let sql = 'SELECT * FROM posts';
-    let params = [];
-
-    if (query) {
-        sql += ' WHERE title LIKE ? OR author LIKE ? OR posted_by LIKE ? OR type LIKE ?';
-        params = [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`];
-    }
-    sql += ' ORDER BY id DESC';
-
-    db.all(sql, params, (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// Create a post (Available to BOTH Users and Admins)
-router.post('/', authenticateToken, (req, res) => {
-    const { title, author, url, type, content } = req.body;
-    
-    db.get('SELECT username FROM users WHERE id = ?', [req.user.id], (err, user) => {
-        if (err || !user) return res.status(403).json({ error: 'User not found' });
-
-        const postedBy = user.username;
-
-        db.run('INSERT INTO posts (title, author, url, type, content, posted_by) VALUES (?, ?, ?, ?, ?, ?)', 
-            [title || 'Untitled', author || 'Anonymous', url || '', type || 'Book', content || '', postedBy], function(err) {
-            if (err) return res.status(500).json({ error: err.message });
-            res.json({ success: 'Resource posted successfully', id: this.lastID });
-        });
-    });
-});
-
-// Admin Only: Get all registered users
- // Make sure bcrypt is required at the top if not already
-
-// Admin Only: Get all registered users
-router.get('/users', authenticateToken, (req, res) => {
-    if (!req.user.isAdmin) return res.status(403).json({ error: 'Admins only' });
-
-    db.all('SELECT id, username, is_admin FROM users', [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// Admin Only: Manually update/reset a user's password
-router.put('/users/:id/password', authenticateToken, async (req, res) => {
-    if (!req.user.isAdmin) {
-        return res.status(403).json({ error: 'Access denied. Admins only.' });
-    }
-
-    const userId = req.params.id;
-    const { newPassword } = req.body;
-
-    if (!newPassword || newPassword.trim() === '') {
-        return res.status(400).json({ error: 'New password cannot be empty' });
-    }
-
+// Security Middleware to verify logged-in user
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: "Access denied" });
+    const token = authHeader.split(' ')[1];
     try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified;
+        next();
+    } catch (err) {
+        res.status(400).json({ error: "Invalid token" });
+    }
+};
 
-        db.run('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId], function(err) {
-            if (err) return res.status(500).json({ error: err.message });
-            if (this.changes === 0) return res.status(404).json({ error: 'User not found' });
+// GET: Fetch all posts
+router.get('/', verifyToken, async (req, res) => {
+    try {
+        const posts = await Post.find().sort({ createdAt: -1 });
+        res.json(posts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 
-            res.json({ success: 'User password updated successfully by admin' });
-        });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error while hashing password' });
+// POST: Upload a new resource with strict error handling
+router.post('/', verifyToken, (req, res) => {
+    upload.single('mediaFile')(req, res, async function (err) {
+        if (err) {
+            console.error("Cloudinary Upload Error:", err);
+            return res.status(400).json({ error: "Cloudinary Error: " + err.message });
+        }
+        
+        try {
+            const { title, type, articleHtml } = req.body;
+            let fileUrl = '';
+            
+            if (req.file) {
+                fileUrl = req.file.path; 
+            }
+
+            const newPost = new Post({
+                title,
+                type,
+                articleHtml,
+                fileUrl,
+                postedBy: req.user.username
+            });
+
+            await newPost.save();
+            res.status(201).json(newPost);
+        } catch (dbError) {
+            console.error("Database Error:", dbError);
+            res.status(500).json({ error: "Failed to save post to database." });
+        }
+    });
+});
+
+// PUT: Edit an existing resource
+router.put('/:id', verifyToken, async (req, res) => {
+    try {
+        const updatedPost = await Post.findByIdAndUpdate(
+            req.params.id,
+            { title: req.body.title, type: req.body.type, articleHtml: req.body.articleHtml },
+            { new: true }
+        );
+        res.json(updatedPost);
+    } catch (err) {
+        res.status(500).json({ error: "Update failed on server." });
+    }
+});
+
+// DELETE: Remove a resource
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        await Post.findByIdAndDelete(req.params.id);
+        res.json({ message: "Post deleted" });
+    } catch (err) {
+        res.status(500).json({ error: "Delete failed on server." });
     }
 });
 
