@@ -1,66 +1,55 @@
-# 📚 Modern E-Library Portal
+# 📚 EduLib Knowledge Hub
 
-A feature-rich, community-driven e-library web application built with **Node.js, Express, SQLite, and Tailwind CSS**. This platform allows members and administrators to discover, share, and manage various educational resources including books, videos, articles, images, PDFs, text notes, and links.
+> A secure, enterprise-grade knowledge management and workspace collaboration portal designed to streamline institutional resource distribution, document sharing, and administrative oversight.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Access%20EduLib%20Portal-0284c7?style=for-the-badge&logo=render&logoColor=white)](https://your-app-name.onrender.com)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js%20%2F%20Express-1e293b?style=for-the-badge&logo=node.js&logoColor=339933)](https://nodejs.org/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-1e293b?style=for-the-badge&logo=mongodb&logoColor=47A248)](https://www.mongodb.com/)
+[![Cloudinary](https://img.shields.io/badge/Storage-Cloudinary%20CDN-1e293b?style=for-the-badge&logo=cloudinary&logoColor=3448C5)](https://cloudinary.com/)
+
+---
+
+## 🌟 Overview
+
+**EduLib Hub** is an intelligent workspace platform engineered to eliminate information silos. It provides organizations with a centralized ecosystem to securely organize, discover, and collaborate on essential resources—including technical documentation, research papers, official notices, and multimedia assets.
 
 ---
 
 ## ✨ Key Features
 
-* **🔐 Secure Authentication:** Robust user registration and login system powered by **JWT (JSON Web Tokens)** and **bcryptjs** password hashing.
-* **👥 Separate Auth Flows:** Clean tab-switched interface for signing in or creating new accounts seamlessly.
-* **🌐 Community Sharing Feed:** Registered users and admins can publish resources, upload file/media links, and write custom text notes/summaries for others to view.
-* **🏷️ Creator Attribution:** Every shared resource tracks and displays who posted it (*"Posted by: [Username]"*).
-* **🔍 Real-Time Search:** Instantly filter resources by title, author, creator, or resource type as you type.
-* **🛡️ Admin Command Center:** Dedicated management console allowing administrators to audit all registered platform users, manually reset user passwords, and publish official library media.
-* **🎨 Modern Glassmorphism UI:** Styled with **Tailwind CSS**, featuring responsive cards, smooth transitions, custom toast notification alerts, and a password visibility toggle.
+* **🌐 Single-Screen SaaS Landing Experience:** Clean, side-by-side authentication screen featuring an overview of the platform's core advantages.
+* **📂 Unified Library & Feeds:** Dynamic filtering between community-wide knowledge repositories and personal user contributions.
+* **☁️ Multi-Format Cloud Storage:** Secure asset integration via Cloudinary with automatic raw-file streaming to support PDFs, Word documents, videos, and images without browser crash errors.
+* **🔒 Robust Authentication & RBAC:** Stateless session handling using JSON Web Tokens (JWT) and secure password encryption via `bcrypt`.
+* **⚙️ Interactive IT Admin Control Panel:** 
+  * Global resource broadcasting with **Quill.js** rich-text formatting.
+  * Uniform administrative card controls (Edit & Delete actions across all feed items).
+  * Collapsible **IT Helpdesk** widget with clear input labels for force-resetting employee credentials.
+* **🎨 Modern Enterprise UI:** Scannable card layouts, SVG icon sets, title-case standardization, and automated text truncation with expandable *Read More* views.
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend:** Node.js, Express.js, SQLite3
-* **Security & Auth:** JSON Web Tokens (JWT), bcryptjs, CORS middleware
-* **Frontend:** HTML5, Tailwind CSS, jQuery, Google Fonts (Inter)
-* **Hosting Platform:** Render (Cloud Web Service)
+* **Frontend:** HTML5, CSS3, Vanilla JavaScript (ES6+), Quill.js WYSIWYG Editor
+* **Backend:** Node.js, Express.js, Multer, JWT, bcryptjs
+* **Database:** MongoDB Atlas (Mongoose ODM)
+* **Storage & Hosting:** Cloudinary CDN, Render Cloud Platform
 
 ---
 
-## 🚀 Live Demo & Access
+## 🚀 Access the Live Application
 
-You can access the live application directly in your browser without installing anything locally:
-* **Live App URL:https://e-library-i4ws.onrender.com/dashboard.html
-
----
-
-## 🔑 Test Credentials for Evaluators & Recruiters
-
-You can use the following accounts to test both standard user features and administrative privileges right out of the box:
-
-### 👤 Example Member Account
-* **Username:** `User1`
-* **Password:** `User123`
-* *Access:* Community feed, resource sharing modal, search functionality, creator attribution.
-
-### 🛡️ Administrator Account
-* **Username:** `AdminZubair`
-* **Password:** `SecurePassword123`
-* *Access:* Full admin command center, member auditing table, manual password reset tool, and official publishing capabilities.
+Experience the live production deployment here:  
+👉 **[View EduLib Knowledge Hub Live Demo](https://your-app-name.onrender.com)**
 
 ---
 
-## 📁 Project Structure
+## ⚙️ Local Installation & Setup
 
-```text
-e-library/
-├── middleware/
-│   └── auth.js          # JWT token verification middleware
-├── routes/
-│   └── bookRoutes.js    # API endpoints for posts, searching, user auditing, and password resets
-├── public/
-│   ├── index.html       # Sign In & Register portal
-│   ├── dashboard.html   # Community feed & resource sharing modal
-│   └── admin.html       # Admin command center, user audit table, and password management
-├── database.js          # SQLite database setup and default admin seeding
-├── server.js            # Express app entry point
-├── package.json         # Project dependencies and scripts
-└── .gitignore           # Ignores node_modules and local database
+If you wish to run the project locally on your machine, follow these steps:
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/Zubairr3/EduLib-Hub.git](https://github.com/Zubairr3/EduLib-Hub.git)
+   cd EduLib-Hub
