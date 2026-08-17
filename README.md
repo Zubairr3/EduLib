@@ -41,7 +41,7 @@
 ## 🚀 Access the Live Application
 
 Experience the live production deployment here:  
-👉 **[View EduLib Knowledge Hub Live Demo](https://your-app-name.onrender.com)**
+👉 **[View EduLib Knowledge Hub Live Demo](https://edulib-7ane.onrender.com/)**
 
 ---
 
