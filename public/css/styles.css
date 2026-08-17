@@ -2,7 +2,8 @@
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #334155; }
 
 /* Navbar - Improved Padding */
-.navbar { background: #1a2a3a; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.navbar { 
+  background: #1a2a3a; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .navbar h2 { margin: 0; color: #ffffff; font-size: 18px; }
 .nav-controls { display: flex; align-items: center; gap: 20px; }
 .logout-btn { background: transparent; color: #ffffff; border: 1px solid #4a5c6d; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s;}
@@ -54,3 +55,13 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-
 .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; }
 .toast { visibility: hidden; min-width: 300px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 30px; padding: 12px 24px; position: fixed; z-index: 2000; left: 50%; top: 20px; transform: translateX(-50%) translateY(-50px); font-size: 14px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); opacity: 0; transition: visibility 0s 0.5s, opacity 0.5s, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
 .toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); transition: visibility 0s 0s, opacity 0.5s, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+
+/* Modal Scrolling Fix */
+.modal-overlay {
+    overflow-y: auto !important;
+    align-items: flex-start !important;
+    padding: 40px 15px !important;
+}
+.modal-content {
+    margin: auto !important;
+}
